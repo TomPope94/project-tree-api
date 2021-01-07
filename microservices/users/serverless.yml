@@ -1,4 +1,4 @@
-service: project-tree-api-trees
+service: project-tree-api-users
 
 plugins:
   - serverless-bundle
@@ -10,7 +10,7 @@ frameworkVersion: "2"
 custom:
   customDomain:
     domainName: api.magnapps.com
-    basePath: "trees"
+    basePath: "users"
     stage: dev
     createRoute53Record: true
 
@@ -24,7 +24,7 @@ provider:
   apiGateway:
     shouldStartNameWithService: true
   environment:
-    tableName: test
+    usersTableName: TechTree_Users
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -38,12 +38,29 @@ provider:
       Resource: "arn:aws:dynamodb:eu-west-1:*:*"
 
 useDotenv: true
+
 functions:
-  createTree:
-    handler: services/createTree.main
+  createUser:
+    handler: services/createUser.main
     events:
       - http:
-          path: /calendar-outlook
+          path: /
           method: post
+          cors: true
+          authorizer: aws_iam
+  getUserLogin:
+    handler: services/getUserLogin.main
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+          authorizer: aws_iam
+  updateUser:
+    handler: services/updateUser.main
+    events:
+      - http:
+          path: /
+          method: put
           cors: true
           authorizer: aws_iam
