@@ -1,0 +1,49 @@
+service: project-tree-api-trees
+
+plugins:
+  # - serverless-webpack
+  - serverless-offline
+  - serverless-domain-manager
+
+frameworkVersion: "2"
+
+custom:
+  customDomain:
+    domainName: api.magnapps.com
+    basePath: "trees"
+    stage: dev
+    createRoute53Record: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+  endpointType: REGIONAL
+  lambdaHashingVersion: "20201221"
+  apiGateway:
+    shouldStartNameWithService: true
+  environment:
+    tableName: test
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-west-1:*:*"
+
+useDotenv: true
+functions:
+  createTree:
+    handler: services/createTree.main
+    events:
+      - http:
+          path: /calendar-outlook
+          method: post
+          cors: true
+          authorizer: aws_iam
